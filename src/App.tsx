@@ -1,11 +1,9 @@
-// import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
+import Index from './pages/index'
 function App() {
   return (
-    <>
-    <Login/>
-    {/* <Dashboard/> */}
-    </>
+    <div>
+      <Index/>
+    </div>
   );
 }
 
