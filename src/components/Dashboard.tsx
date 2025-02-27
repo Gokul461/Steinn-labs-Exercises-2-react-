@@ -489,7 +489,7 @@ export default function StudentTable() {
       bottomContentPlacement="outside"
       checkboxesProps={{
         classNames: {
-          wrapper: "after:bg-foreground after:text-background text-background",
+          wrapper: "after:bg-foreground shadow-lg after:text-background text-background",
         },
       }}
       classNames={classNames}
