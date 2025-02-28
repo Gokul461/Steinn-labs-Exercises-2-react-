@@ -10,7 +10,6 @@ import {
     Button,
 } from "@heroui/react";
 
-// Define TypeScript interface for form data
 interface StudentData {
     name: string;
     email: string;
@@ -51,8 +50,11 @@ export const PlusIcon = ({ size = 24, width, height, ...props }: CustomSVGProps)
     );
 };
 
+
 const AddStudent: React.FC = () => {
+
     const [isOpen, setIsOpen] = useState(false);
+ 
     const [formData, setFormData] = useState<StudentData>({
         name: "",
         email: "",
@@ -63,7 +65,7 @@ const AddStudent: React.FC = () => {
         isActive: false,
     });
 
-    // Handle input changes
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         setFormData((prev) => ({
@@ -75,9 +77,9 @@ const AddStudent: React.FC = () => {
         }));
     };
 
-    // Handle form submission
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
 
         const { name, email, age, phone, address, gender } = formData;
         if (!name || !email || !age || !phone || !address || !gender) {
@@ -92,121 +94,54 @@ const AddStudent: React.FC = () => {
             setIsOpen(false);
         } catch (error) {
             console.error("Error adding document:", error);
+          
             alert("Error submitting data: " + error);
+            
         }
+          
     };
 
     return (
         <>
-            {/* Button to Open Modal */}
-            <Button color="secondary" onClick={() => setIsOpen(true)} endContent={<PlusIcon />}>
+            <Button className="bg-teal-700 text-white hover:bg-teal-600 rounded-lg px-4 py-2" onClick={() => setIsOpen(true)} endContent={<PlusIcon />}>
                 Add New 
             </Button>
 
-            {/* Modal for Adding Student */}
-            <Modal
-                backdrop="opaque"
-                classNames={{
-                    body: "py-6",
-                    backdrop: "bg-[#292f46]/50 backdrop-opacity-40",
-                    base: "border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3]",
-                    header: "border-b-[1px] border-[#292f46]",
-                    footer: "border-t-[1px] border-[#292f46]",
-                    closeButton: "hover:bg-white/5 active:bg-white/10",
-                }}
-                isOpen={isOpen}
-                onOpenChange={setIsOpen}
-                radius="lg"
-            >
+            <Modal isOpen={isOpen} onOpenChange={setIsOpen} radius="lg">
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="text-center text-xl font-bold text-gray-300">
+                            <ModalHeader className="text-center text-xl font-bold text-gray-800">
                                 Add New Student
                             </ModalHeader>
 
                             <ModalBody>
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        placeholder="Full Name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                        required
-                                    />
-                                    <input
-                                        type="number"
-                                        name="age"
-                                        placeholder="Age"
-                                        value={formData.age}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                        required
-                                    />
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        placeholder="Email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                        required
-                                    />
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        placeholder="Phone Number"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                        required
-                                    />
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        placeholder="Address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                        required
-                                    />
-                                    <select
-                                        name="gender"
-                                        value={formData.gender}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                        required
-                                    >
+                                <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow-lg text-gray-800">
+                                    <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500" required />
+                                    <input type="number" name="age" placeholder="Age" value={formData.age} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500" required />
+                                    <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500" required />
+                                    <input type="tel" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500" required />
+                                    <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500" required />
+                                    <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500" required>
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                         <option value="Other">Other</option>
                                     </select>
-                                    <label className="block text-gray-300">Active Status</label>
-                                    <select
-                                        name="isActive"
-                                        value={formData.isActive.toString()}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border border-gray-600 rounded-md bg-[#2d2d44] text-white focus:outline-none"
-                                    >
-                                        <option value="false">Inactive</option>
-                                        <option value="true">Active</option>
-                                    </select>
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-                                    >
+                                    <label className="block text-gray-800">Active Status
+                                        <select name="isActive" value={formData.isActive.toString()} onChange={handleChange} className="w-full p-2 border mt-2 border-gray-300 rounded-md bg-white text-gray-800 focus:outline-blue-500">
+                                            <option value="false">Inactive</option>
+                                            <option value="true">Active</option>
+                                        </select>
+                                    </label>
+                                    <button type="submit" className="bg-blue-600 text-white mt-7 rounded-md hover:bg-blue-700 transition w-[160px] h-[45px]">
                                         Submit
                                     </button>
                                 </form>
                             </ModalBody>
 
                             <ModalFooter>
-                                <Button variant="light" onClick={onClose}>
-                                    Close
-                                </Button>
+                                <Button onClick={onClose} className="bg-gray-400 text-white hover:bg-gray-500">Close</Button>
                             </ModalFooter>
                         </>
                     )}

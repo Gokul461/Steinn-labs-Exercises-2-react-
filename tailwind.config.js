@@ -11,6 +11,13 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    fontFamily: {
+      grechen: ["Grechen Fuemen", "cursive"],
+      montserrat: ["Montserrat", "sans-serif"],
+      poppins: ["Poppins", "sans-serif"],
+      prompt: ["Prompt", "sans-serif"],
+      roboto: ["Roboto", "sans-serif"],
+    },
   },
   darkMode: "class",
   plugins: [heroui()],

@@ -20,8 +20,9 @@ import {
 } from "@heroui/react";
 import { db } from "../pages/firebase";
 import { capitalize } from "lodash";
-import { collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import AddStudentModal from "./Additem";
+import EditStudentModal from "./Edititem";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -32,6 +33,7 @@ export type Student = {
   name: string;
   gender: string;
   phone: string;
+  age: string;
   email: string;
   address: string;
   isActive: boolean;
@@ -40,10 +42,11 @@ export type Student = {
 export const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "NAME", uid: "name", sortable: true },
+  { name: "AGE", uid: "age", sortable: true },
   { name: "GENDER", uid: "gender" },
   { name: "PHONE", uid: "phone" },
   { name: "EMAIL", uid: "email" },
-  { name: "ADDRESS", uid: "address" },
+  { name: "ADDRESS", uid: "address",sortable: true },
   { name: "STATUS", uid: "isActive", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
@@ -53,32 +56,7 @@ export const statusOptions = [
   { name: "Inactive", uid: "inactive" },
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "gender", "phone", "email", "address", "isActive", "actions"];
-export const PlusIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      focusable="false"
-      height={size || height}
-      role="presentation"
-      viewBox="0 0 24 24"
-      width={size || width}
-      {...props}
-    >
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-      >
-        <path d="M6 12h12" />
-        <path d="M12 18V6" />
-      </g>
-    </svg>
-  );
-};
+const INITIAL_VISIBLE_COLUMNS = ["name", "gender","age", "phone", "email", "address", "isActive", "actions"];
 
 export const VerticalDotsIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => {
   return (
@@ -177,16 +155,24 @@ export default function StudentTable() {
     fetchStudents();
   }, []);
 
+  const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
+  const updateStudent = async (id: string, updatedStudent: Omit<Student, "id">) => {
+    const studentDoc = doc(db, "students", id);
+    await updateDoc(studentDoc, updatedStudent);
+    setStudents(students.map((student) => (student.id === id ? { id, ...updatedStudent } : student)));
+  };
+
+  const editStudent = (id: string) => {
+    const student = students.find((student) => student.id === id);
+    if (student) {
+      setCurrentStudent(student);
+      setIsModalOpen(true);
+    }
+  };
 
   const deleteStudent = async (id: string) => {
     await deleteDoc(doc(db, "students", id));
     setStudents(students.filter((student) => student.id !== id));
-  };
-
-  const editStudent = async (id: string, updatedStudent: Partial<Student>) => {
-    const studentDoc = doc(db, "students", id);
-    await updateDoc(studentDoc, updatedStudent);
-    setStudents(students.map((student) => (student.id === id ? { ...student, ...updatedStudent } : student)));
   };
 
   const hasSearchFilter = Boolean(filterValue);
@@ -199,20 +185,23 @@ export default function StudentTable() {
 
   const filteredItems = React.useMemo(() => {
     let filteredStudents = [...students];
-
+  
     if (hasSearchFilter) {
       filteredStudents = filteredStudents.filter((student) =>
-        student.name.toLowerCase().includes(filterValue.toLowerCase())
+        student.name.toLowerCase().includes(filterValue.toLowerCase()) ||
+        student.address.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
+  
     if (statusFilter !== "all") {
       filteredStudents = filteredStudents.filter((student) =>
         statusFilter.has("active") ? student.isActive : !student.isActive
       );
     }
-
+  
     return filteredStudents;
-  }, [students, filterValue, statusFilter]);
+  }, [students, filterValue, statusFilter, hasSearchFilter]);
+  
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -240,16 +229,16 @@ export default function StudentTable() {
       case "name":
         return (
           <User
-            avatarProps={{ radius: "lg", src: "#" + student.id }}
-            description={student.email}
-            name={cellValue as string}
+            avatarProps={{ radius: "lg", src: "https://img.freepik.com/free-vector/user-circles-set_78370-4704.jpg?ga=GA1.1.1343520097.1717989475&semt=ais_hybrid" + student.id }}
+            // description={student.email}
+            name={capitalize(cellValue as string)}
           >
             {student.email}
           </User>
         );
       case "isActive":
         return (
-          <Chip className="capitalize" color={student.isActive ? "success" : "danger"} size="sm" variant="flat">
+          <Chip className="capitalize" color={student.isActive ? "success" : "danger"}  size="sm" variant="dot">
             {student.isActive ? "Active" : "Inactive"}
           </Chip>
         );
@@ -259,11 +248,11 @@ export default function StudentTable() {
             <Dropdown>
               <DropdownTrigger>
                 <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
+                  <VerticalDotsIcon className="text-default-900" />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem key="edit" onPress={() => setIsModalOpen(true)}>Edit</DropdownItem>
+                <DropdownItem key="edit" onPress={()=> editStudent(student.id)}>Edit</DropdownItem>
                 <DropdownItem key="delete" onPress={() => deleteStudent(student.id)}>Delete</DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -311,7 +300,8 @@ export default function StudentTable() {
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
-            className="w-full sm:max-w-[44%]"
+            variant="underlined"
+            className="w-full sm:max-w-[44%] rounded-md"
             placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
@@ -321,7 +311,7 @@ export default function StudentTable() {
           <div className="flex gap-3">
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button className="bg-gray-200" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Status
                 </Button>
               </DropdownTrigger>
@@ -342,7 +332,7 @@ export default function StudentTable() {
             </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button className="bg-gray-200" endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Columns
                 </Button>
               </DropdownTrigger>
@@ -393,26 +383,33 @@ export default function StudentTable() {
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
-       <span className="w-[30%] text-small text-default-400">
-       <span className="w-[30%] text-small text-default-400">
+       <span className="w-[30%] text-small text-default-500">
+       <span className="w-[30%] text-small text-default-500">
           {selectedKeys === "all"
             ? "All items selected" :` ${selectedKeys.size} of ${filteredItems.length} selected`}
         </span>
         </span>
         <Pagination
-          isCompact
-          showControls
-          showShadow
-          color="primary"
-          page={page}
-          total={pages}
-          onChange={setPage}
+         isCompact
+         showControls
+
+         showShadow={false}
+         page={page}
+         variant="light"
+         total={pages}
+         onChange={setPage}
+          classNames={{
+            wrapper: "gap-0 overflow-visible h-8 rounded border border-divider",
+            item: "w-8 h-8 text-small rounded-none bg-transparent",
+            cursor:
+              "bg-gradient-to-b shadow-lg from-teal-900 to-teal-800 dark:from-teal-300 dark:to-teal-100 text-white font-bold",
+          }}
         />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+          <Button isDisabled={pages === 1} size="sm" variant="flat" className="bg-teal-700 text-white" onPress={onPreviousPage}>
             Previous
           </Button>
-          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+          <Button isDisabled={pages === 1} size="sm" variant="flat" className="bg-teal-700 text-white" onPress={onNextPage}>
             Next
           </Button>
         </div>
@@ -428,20 +425,26 @@ export default function StudentTable() {
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={{
-          wrapper: "max-h-[382px]",
+          wrapper: "max-h-[382px] bg-white shadow-lg rounded-lg",
+            td: "bg-white  font-semibold ",
+            th: "bg-zinc-200 text-white font-semibold ",
+            tr: "bg-white  font-semibold hover:bg-black ",
         }}
         selectedKeys={selectedKeys}
         selectionMode="multiple"
+        disableAnimation={false}
         sortDescriptor={sortDescriptor}
+        
         topContent={topContent}
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
       >
-        <TableHeader columns={headerColumns}>
+        <TableHeader columns={headerColumns} className="text-black" >
           {(column) => (
             <TableColumn
               key={column.uid}
+              className="text-black"
               align={column.uid === "actions" ? "center" : "start"}
               allowsSorting={column.sortable}
             >
@@ -451,12 +454,17 @@ export default function StudentTable() {
         </TableHeader>
         <TableBody emptyContent={"No students found"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow key={item.id} className="text-black bg-opacity-4 hover:bg-[#475569] rounded-lg hover:text-black">
               {(columnKey) => <TableCell>{renderCell(item, columnKey as string)}</TableCell>}
             </TableRow>
           )}
         </TableBody>
       </Table>
+      <EditStudentModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      onUpdateStudent={updateStudent}
+      studentData={currentStudent}/>
     </>
   );
 }
