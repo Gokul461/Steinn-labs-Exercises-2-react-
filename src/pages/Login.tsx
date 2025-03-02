@@ -32,28 +32,35 @@ const Login: React.FC = () => {
         setUserEmail(email);
         navigate("/dashboard");
       } else {
-        if (password !== confirm) {
-          showToast("Error", "Passwords do not match!");
-          return;
-        }
-        
         await createUserWithEmailAndPassword(auth, email, password);
         setUserEmail(email);
-        setLogin('login')
+        setLogin("login"); 
+
+        if (password !== confirm) {
+          showToast("Error", "Passwords do not match!");
+          setIsLoading(false); 
+          return;
+        }
       }
     } catch (error: any) {
       let errorMessage = "An error occurred. Please try again.";
 
-      if (error.code === "auth/email-already-in-use") {
-        errorMessage = "Email already exists! Try logging in.";
-      } else if (error.code === "auth/invalid-email") {
-        errorMessage = "Invalid email format!";
-      } else if (error.code === "auth/wrong-password") {
-        errorMessage = "Incorrect password!";
-      } else if (error.code === "auth/user-not-found") {
-        errorMessage = "User not found! Please sign up.";
-      } else if (error.code === "auth/weak-password") {
-        errorMessage = "Password should be at least 6 characters.";
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "Email already exists! Try logging in.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email format!";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password!";
+          break;
+        case "auth/user-not-found":
+          errorMessage = "User not found! Please sign up.";
+          break;
+        case "auth/weak-password":
+          errorMessage = "Password should be at least 6 characters.";
+          break;
       }
 
       showToast("", errorMessage);
@@ -79,7 +86,7 @@ const Login: React.FC = () => {
         toastOffset={60}
       />
 
-      <div className="w-[420px] h-[420px] flex flex-col rounded-xl shadow-xl bg-white/10 backdrop-blur-lg p-8 border border-white/20 transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <div className="w-[420px] h-auto flex flex-col rounded-xl shadow-xl bg-white/10 backdrop-blur-lg p-8 border border-white/20 transition-all duration-300 ease-in-out hover:shadow-2xl">
         <h1 className="text-2xl font-semibold text-center text-white mb-4">
           {login === "login" ? `Welcome Back ${fname || ""}` : "Create an Account"}
         </h1>

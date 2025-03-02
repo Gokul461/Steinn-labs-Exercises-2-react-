@@ -1,8 +1,11 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "../pages/firebase"; 
 
 // Define types for AuthContext
 interface AuthContextType {
   userEmail: string;
+  user: User | null;
   setUserEmail: (email: string) => void;
 }
 
@@ -24,10 +27,20 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setUserEmail(currentUser?.email || ""); // ✅ Update userEmail on auth change
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ userEmail, setUserEmail }}>
+    <AuthContext.Provider value={{ user, userEmail, setUserEmail }}>
       {children}
     </AuthContext.Provider>
   );

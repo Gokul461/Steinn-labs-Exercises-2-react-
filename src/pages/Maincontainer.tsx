@@ -1,18 +1,14 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../services/AuthContext";
 import { Button } from "@heroui/react";
-import { useState, useEffect } from "react";
-import { Home, LayoutDashboard, LogOut, Settings } from "lucide-react";
+import { useState } from "react";
+import { LayoutDashboard, LogOut, Settings } from "lucide-react";
 
 const Maincontainer = () => {
   const { userEmail} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);
-
-  useEffect(() => {
-    setActive(location.pathname);
-  }, [location.pathname]);
 
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", id: "/dashboard", icon: <LayoutDashboard size={20} /> },
@@ -64,7 +60,7 @@ const Maincontainer = () => {
               <p className="text-gray-400 ms-5">Not Signed In</p>
               <Button
                 className="bg-teal-800 text-white px-6 py-1 ms-3 rounded-md transition hover:bg-teal-800"
-                onPress={() => navigate("/")}
+                onPress={() => navigate("/login")}
               >
                 Sign In
               </Button>
