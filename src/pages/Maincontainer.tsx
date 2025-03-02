@@ -21,7 +21,7 @@ const Maincontainer = () => {
   ];
 
   return (
-    <div className="flex h-screen p-6 bg-gray-400">
+    <div className="flex h-screen bg-gray-400">
       <aside className="w-[300px] bg-gray-200 text-white flex flex-col justify-between shadow-lg">
         <div className="p-4">
           <h2 className="text-2xl font-bold tracking-wide mb-6 text-black flex items-center gap-2">
@@ -63,7 +63,7 @@ const Maincontainer = () => {
             <div className="flex flex-row mt-2 items-center text-center gap-5">
               <p className="text-gray-400 ms-5">Not Signed In</p>
               <Button
-                className="bg-teal-700 text-white px-6 py-1 ms-3 rounded-md transition hover:bg-teal-800"
+                className="bg-teal-800 text-white px-6 py-1 ms-3 rounded-md transition hover:bg-teal-800"
                 onPress={() => navigate("/")}
               >
                 Sign In

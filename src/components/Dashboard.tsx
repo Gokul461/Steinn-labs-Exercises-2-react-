@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Chip,
+  Spinner,
   User,
   Pagination,
   Selection,
@@ -20,9 +21,9 @@ import {
 } from "@heroui/react";
 import { db } from "../pages/firebase";
 import { capitalize } from "lodash";
-import { collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
-import AddStudentModal from "./Additem";
-import EditStudentModal from "./Edititem";
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc} from "firebase/firestore";
+// import AddStudentModal from "./Additem";
+import Modalcompo from "./Modal";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -33,7 +34,7 @@ export type Student = {
   name: string;
   gender: string;
   phone: string;
-  age: string;
+  age: number;
   email: string;
   address: string;
   isActive: boolean;
@@ -131,7 +132,31 @@ export const ChevronDownIcon = ({ strokeWidth = 1.5, ...otherProps }: IconSvgPro
     </svg>
   );
 };
-
+export const PlusIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height={size || height}
+      role="presentation"
+      viewBox="0 0 24 24"
+      width={size || width}
+      {...props}
+    >
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+      >
+        <path d="M6 12h12" />
+        <path d="M12 18V6" />
+      </g>
+    </svg>
+  );
+};
 export default function StudentTable() {
   const [students, setStudents] = useState<Student[]>([]);
   const [filterValue, setFilterValue] = useState("");
@@ -139,28 +164,40 @@ export default function StudentTable() {
   const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "name",
     direction: "ascending",
   });
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   useEffect(() => {
     const fetchStudents = async () => {
-      const querySnapshot = await getDocs(collection(db, "students"));
-      const studentsData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Student));
-      setStudents(studentsData);
+      try {
+        const querySnapshot = await getDocs(collection(db, "students"));
+        const studentsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Student[];
+        setStudents(studentsData);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      } finally {
+        setIsLoading(false); // Stop loading after fetching data
+      }
     };
+  
     fetchStudents();
   }, []);
 
   const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
+
   const updateStudent = async (id: string, updatedStudent: Omit<Student, "id">) => {
     const studentDoc = doc(db, "students", id);
     await updateDoc(studentDoc, updatedStudent);
     setStudents(students.map((student) => (student.id === id ? { id, ...updatedStudent } : student)));
   };
+
 
   const editStudent = (id: string) => {
     const student = students.find((student) => student.id === id);
@@ -169,12 +206,15 @@ export default function StudentTable() {
       setIsModalOpen(true);
     }
   };
+  const addStudent = async (student: Omit<Student, "id">) => {
+    const docRef = await addDoc(collection(db, "students"), student);
+    setStudents([...students, { id: docRef.id, ...student }]);
+  };
 
   const deleteStudent = async (id: string) => {
     await deleteDoc(doc(db, "students", id));
     setStudents(students.filter((student) => student.id !== id));
   };
-
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
@@ -351,7 +391,7 @@ export default function StudentTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-      <AddStudentModal/>
+            <Button  className="text-white bg-teal-800 transition" endContent={<PlusIcon />} onPress={() => { setCurrentStudent(null); setIsModalOpen(true)}}>Add New</Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -390,26 +430,27 @@ export default function StudentTable() {
         </span>
         </span>
         <Pagination
-         isCompact
-         showControls
-
-         showShadow={false}
-         page={page}
-         variant="light"
-         total={pages}
-         onChange={setPage}
-          classNames={{
-            wrapper: "gap-0 overflow-visible h-8 rounded border border-divider",
-            item: "w-8 h-8 text-small rounded-none bg-transparent",
-            cursor:
-              "bg-gradient-to-b shadow-lg from-teal-900 to-teal-800 dark:from-teal-300 dark:to-teal-100 text-white font-bold",
-          }}
-        />
+      key={page} 
+      isCompact
+      showControls
+      initialPage={page}
+      showShadow={false}
+      page={page}
+      variant="light"
+      total={pages}
+      onChange={setPage}
+      classNames={{
+        wrapper: "gap-0 overflow-visible h-8 rounded border border-divider",
+        item: "w-8 h-8 text-small rounded-none bg-transparent",
+        cursor:
+          "bg-gradient-to-b shadow-lg from-teal-900 to-teal-800 dark:from-teal-300 dark:to-teal-100 text-white font-bold",
+      }}
+    />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button isDisabled={pages === 1} size="sm" variant="flat" className="bg-teal-700 text-white" onPress={onPreviousPage}>
+          <Button isDisabled={pages === 1} size="sm" variant="flat" className="bg-teal-900 text-white" onPress={onPreviousPage}>
             Previous
           </Button>
-          <Button isDisabled={pages === 1} size="sm" variant="flat" className="bg-teal-700 text-white" onPress={onNextPage}>
+          <Button isDisabled={pages === 1} size="sm" variant="flat" className="bg-teal-900 text-white" onPress={onNextPage}>
             Next
           </Button>
         </div>
@@ -418,53 +459,58 @@ export default function StudentTable() {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <>
-      <Table
-        isHeaderSticky
-        aria-label="Example table with custom cells, pagination and sorting"
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        classNames={{
-          wrapper: "max-h-[382px] bg-white shadow-lg rounded-lg",
-            td: "bg-white  font-semibold ",
-            th: "bg-zinc-200 text-white font-semibold ",
-            tr: "bg-white  font-semibold hover:bg-black ",
-        }}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
-        disableAnimation={false}
-        sortDescriptor={sortDescriptor}
+    <div>
+       
+          <Table
+            isHeaderSticky
+            aria-label="Example table with custom cells, pagination and sorting"
+            bottomContent={bottomContent}
+            bottomContentPlacement="outside"
+            classNames={{
+              wrapper: "h-[382px] bg-white shadow-lg rounded-lg",
+                td: "bg-white  font-semibold ",
+                th: "bg-zinc-200 text-white font-semibold",
+                tr: "bg-white  font-semibold hover:bg-black ",
+            }}
+            selectedKeys={selectedKeys}
+            selectionMode="multiple"
+            disableAnimation={false}
+            sortDescriptor={sortDescriptor}
+            
+            topContent={topContent}
+            topContentPlacement="outside"
+            onSelectionChange={setSelectedKeys}
+            onSortChange={setSortDescriptor}
+          >
+            <TableHeader columns={headerColumns} className="text-black" >
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  className="text-black"
+                  align={column.uid === "actions" ? "center" : "start"}
+                  allowsSorting={column.sortable}
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody emptyContent={`No students found`} items={sortedItems} isLoading={isLoading} loadingContent={<Spinner label="Loading...." />}>
+              
+              {(item) => (
+                <TableRow key={item.id} className="text-black bg-opacity-4 hover:bg-[#475569] rounded-lg hover:text-black">
+                  {(columnKey) => <TableCell>{renderCell(item, columnKey as string)}</TableCell>}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         
-        topContent={topContent}
-        topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
-      >
-        <TableHeader columns={headerColumns} className="text-black" >
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              className="text-black"
-              align={column.uid === "actions" ? "center" : "start"}
-              allowsSorting={column.sortable}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody emptyContent={"No students found"} items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id} className="text-black bg-opacity-4 hover:bg-[#475569] rounded-lg hover:text-black">
-              {(columnKey) => <TableCell>{renderCell(item, columnKey as string)}</TableCell>}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <EditStudentModal
+          <Modalcompo
       isOpen={isModalOpen}
       onClose={() => setIsModalOpen(false)}
+      onAddStudent={addStudent}
       onUpdateStudent={updateStudent}
-      studentData={currentStudent}/>
-    </>
+      studentData={currentStudent}
+      />
+        </div>
   );
 }
