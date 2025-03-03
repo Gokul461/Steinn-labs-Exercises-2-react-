@@ -18,10 +18,24 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setUserEmail } = useAuth();
 
-  const showToast = (title: string, description: string) => {
-    addToast({ title, description, variant: "bordered" });
+  const showSuccessToast = (title: string, description: string) => {
+    addToast({
+      title,
+      description,
+      variant: "flat", // Fully filled background
+      color: "success", // Green color for success
+    });
   };
-
+  
+  const showErrorToast = (title: string, description: string) => {
+    addToast({
+      title,
+      description,
+      variant: "solid", // Outlined style
+      color: "danger", // Red color for error
+    });
+  };
+  
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -32,38 +46,37 @@ const Login: React.FC = () => {
         setUserEmail(email);
         navigate("/dashboard");
       } else {
+        if (password !== confirm) {
+          showErrorToast("Error", "Passwords do not match!");
+          setIsLoading(false);
+          return;
+        }
+
         await createUserWithEmailAndPassword(auth, email, password);
         setUserEmail(email);
         setLogin("login"); 
-
-        if (password !== confirm) {
-          showToast("Error", "Passwords do not match!");
-          setIsLoading(false); 
-          return;
-        }
+        showSuccessToast("Success", "Account created! Please log in.");
       }
     } catch (error: any) {
-      let errorMessage = "An error occurred. Please try again.";
-
+      let message = "Something went wrong. Please try again.";
       switch (error.code) {
         case "auth/email-already-in-use":
-          errorMessage = "Email already exists! Try logging in.";
+          message = "Email already exists! Try logging in.";
           break;
         case "auth/invalid-email":
-          errorMessage = "Invalid email format!";
+          message = "Invalid email format!";
           break;
-        case "auth/wrong-password":
-          errorMessage = "Incorrect password!";
+        case "auth/invalid-credential":
+          message= "Incorrect email or password";
           break;
         case "auth/user-not-found":
-          errorMessage = "User not found! Please sign up.";
+          message = "User not found! Please sign up.";
           break;
         case "auth/weak-password":
-          errorMessage = "Password should be at least 6 characters.";
+          message = "Password should be at least 6 characters.";
           break;
       }
-
-      showToast("", errorMessage);
+      showErrorToast("", message);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -103,7 +116,7 @@ const Login: React.FC = () => {
           {login === "signup" && (
             <Input placeholder="Re-type your password" isRequired radius="none" type="password" value={confirm} onChange={(e) => setConfirmPassword(e.target.value)} />
           )}
-          <Loadingbtn isLoading={isLoading} className="w-full mx-auto rounded-none" type="submit" disabled={isLoading}>
+          <Loadingbtn isLoading={isLoading} className="w-full mx-auto rounded-none" type="submit" disabled={isLoading || (login === "signup" && password !== confirm)}>
             {login === "login" ? "Login" : "Signup"}
           </Loadingbtn>
         </Form>
@@ -112,14 +125,30 @@ const Login: React.FC = () => {
           {login === "login" ? (
             <>
               Don't have an account?{" "}
-              <button className="text-purple-400 underline focus:outline-none" onClick={() => setLogin("signup")}>
+              <button
+                className="text-purple-400 underline focus:outline-none"
+                onClick={() => {
+                  setLogin("signup");
+                  setEmail("");
+                  setPassword("");
+                  setConfirmPassword("");
+                }}
+              >
                 Sign up
               </button>
             </>
           ) : (
             <>
               Have an account?{" "}
-              <button className="text-purple-400 underline focus:outline-none" onClick={() => setLogin("login")}>
+              <button
+                className="text-purple-400 underline focus:outline-none"
+                onClick={() => {
+                  setLogin("login");
+                  setEmail("");
+                  setPassword("");
+                  setConfirmPassword("");
+                }}
+              >
                 Login
               </button>
             </>

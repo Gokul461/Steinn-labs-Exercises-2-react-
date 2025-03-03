@@ -157,6 +157,7 @@ export const PlusIcon = ({ size = 24, width, height, ...props }: IconSvgProps) =
     </svg>
   );
 };
+
 export default function StudentTable() {
   const [students, setStudents] = useState<Student[]>([]);
   const [filterValue, setFilterValue] = useState("");
@@ -244,6 +245,7 @@ export default function StudentTable() {
   
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
+  console.log(pages);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
