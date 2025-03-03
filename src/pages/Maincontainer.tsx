@@ -1,20 +1,22 @@
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../services/AuthContext";
 import { Button } from "@heroui/react";
 import { useState } from "react";
 import { LayoutDashboard, LogOut, Settings } from "lucide-react";
 
 const Maincontainer = () => {
-  const { userEmail} = useAuth();
+  const { userEmail, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [active, setActive] = useState(location.pathname);
-
+  const [active, setActive] = useState("/dashboard");
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", id: "/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "Settings", path: "/dashboard/setting", id: "/dashboard/setting", icon: <Settings size={20} /> },
-    { name: "Logout", path: "/", id: "/dashboard/logout", icon: <LogOut size={20} /> },
   ];
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen bg-gray-400">
@@ -39,7 +41,13 @@ const Maincontainer = () => {
           </ul>
         </div>
 
-        <div className="mt-auto border-t border-gray-500"></div>
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 p-3 relative bottom-[210px] ms-4 rounded-lg text-gray-700 font-semibold cursor-pointer hover:bg-gray-400 hover:text-white w-[270px] text-left"
+        >
+          <LogOut size={20} /> Logout
+        </button>
 
         <div className="pb-4 px-4 pt-2 text-black flex flex-col items-center">
           {userEmail ? (

@@ -4,14 +4,16 @@ import Login from './Login';
 import Dashboard from '../components/Dashboard';
 import Setting from '../components/Setting';
 import { AuthProvider } from '../services/AuthContext';
-import ProtectedRoute from '../services/ProtectedRouting';  
+import ProtectedRoute from '../services/ProtectedRouting';
 
 function Index() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Login />} />
+        {/* Redirect "/" instantly to "/login" */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Public Route */}
         <Route path="/login" element={<Login />} />
 
         {/* Protected Routes */}
@@ -22,8 +24,8 @@ function Index() {
           </Route>
         </Route>
 
-        {/* Redirect unknown paths to Login */}
-        <Route path="*" element={<Navigate to="/login" />} />
+  
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthProvider>
   );

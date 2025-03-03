@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input, Form } from "@heroui/react";
 import { auth } from "./firebase";
@@ -16,14 +16,14 @@ const Login: React.FC = () => {
   const [confirm, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { setUserEmail } = useAuth();
+  const { setUserEmail,setUser,user } = useAuth();
 
   const showSuccessToast = (title: string, description: string) => {
     addToast({
       title,
       description,
-      variant: "flat", // Fully filled background
-      color: "success", // Green color for success
+      variant: "flat", 
+      color: "success", 
     });
   };
   
@@ -31,8 +31,8 @@ const Login: React.FC = () => {
     addToast({
       title,
       description,
-      variant: "solid", // Outlined style
-      color: "danger", // Red color for error
+      variant: "solid", 
+      color: "danger", 
     });
   };
   
@@ -42,7 +42,8 @@ const Login: React.FC = () => {
 
     try {
       if (login === "login") {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        setUser(userCredential.user);
         setUserEmail(email);
         navigate("/dashboard");
       } else {
@@ -52,8 +53,8 @@ const Login: React.FC = () => {
           return;
         }
 
-        await createUserWithEmailAndPassword(auth, email, password);
-        setUserEmail(email);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        setUser(userCredential.user);
         setLogin("login"); 
         showSuccessToast("Success", "Account created! Please log in.");
       }
@@ -82,6 +83,11 @@ const Login: React.FC = () => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true }); 
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#1A1728] p-6">

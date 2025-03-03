@@ -1,18 +1,21 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User, signOut } from "firebase/auth";
 import { auth } from "../pages/firebase"; 
+import { Spinner } from '@heroui/react';
 
-// Define types for AuthContext
 interface AuthContextType {
-  userEmail: string;
+  userEmail: string | null;
+  logout: () => void;
   user: User | null;
-  setUserEmail: (email: string) => void;
+  loading: boolean;
+  setUserEmail: (email: string | null) => void;
+  setUser: (user: User | null) => void;
 }
 
-// Create Context
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Custom Hook to use AuthContext
+
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -21,27 +24,43 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// AuthProvider Component
+
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [userEmail, setUserEmail] = useState<string>("");
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setUserEmail(currentUser?.email || ""); // ✅ Update userEmail on auth change
+      if (currentUser) {
+        setUser(currentUser);
+        setUserEmail(currentUser.email);
+        localStorage.setItem("userEmail", currentUser.email!);
+      } else {
+        setUser(null);
+        setUserEmail(null);
+        localStorage.removeItem("userEmail");
+      }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null);
+    setUserEmail(null);
+    localStorage.removeItem("userEmail");
+  };
+
   return (
-    <AuthContext.Provider value={{ user, userEmail, setUserEmail }}>
-      {children}
+    <AuthContext.Provider value={{ user, userEmail, setUserEmail, setUser, logout, loading }}>
+      {!loading ? children : <div className="flex h-screen justify-center items-center"><Spinner/></div>}  {/* Show loading until auth check is done */}
     </AuthContext.Provider>
   );
 };
