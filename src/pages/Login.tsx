@@ -35,28 +35,38 @@ const Login: React.FC = () => {
       color: "danger", 
     });
   };
+  useEffect(() => {
+    if (user){
+      if(login == "signup"){
+        setLogin("login");
+        navigate("/login");
+      }
+      else{
+        navigate("/dashboard");
+      }
+    }
+  }, [user, navigate]);
   
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
-      if (login === "login") {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        setUser(userCredential.user);
-        setUserEmail(email);
-        navigate("/dashboard");
-      } else {
+      if (login === "signup") {
         if (password !== confirm) {
           showErrorToast("Error", "Passwords do not match!");
           setIsLoading(false);
           return;
         }
-
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        setUser(userCredential.user);
-        setLogin("login"); 
+        await createUserWithEmailAndPassword(auth, email, password);
         showSuccessToast("Success", "Account created! Please log in.");
+        navigate("/login");       
+  
+      } else {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        setUser(userCredential.user);
+        setUserEmail(email);
+        navigate("/dashboard");
       }
     } catch (error: any) {
       let message = "Something went wrong. Please try again.";
@@ -68,7 +78,7 @@ const Login: React.FC = () => {
           message = "Invalid email format!";
           break;
         case "auth/invalid-credential":
-          message= "Incorrect email or password";
+          message = "Incorrect email or password";
           break;
         case "auth/user-not-found":
           message = "User not found! Please sign up.";
@@ -82,12 +92,9 @@ const Login: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard", { replace: true }); 
-    }
-  }, [user, navigate]);
+  };  
+  
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#1A1728] p-6">
@@ -107,7 +114,7 @@ const Login: React.FC = () => {
 
       <div className="w-[420px] h-auto flex flex-col rounded-xl shadow-xl bg-white/10 backdrop-blur-lg p-8 border border-white/20 transition-all duration-300 ease-in-out hover:shadow-2xl">
         <h1 className="text-2xl font-semibold text-center text-white mb-4">
-          {login === "login" ? `Welcome Back ${fname || ""}` : "Create an Account"}
+          {login === "login" ? `Login here!` : "Create an Account"}
         </h1>
 
         <Form className="flex flex-col gap-4 flex-1 justify-center" onSubmit={handleAuth}>
@@ -135,9 +142,6 @@ const Login: React.FC = () => {
                 className="text-purple-400 underline focus:outline-none"
                 onClick={() => {
                   setLogin("signup");
-                  setEmail("");
-                  setPassword("");
-                  setConfirmPassword("");
                 }}
               >
                 Sign up
@@ -150,9 +154,6 @@ const Login: React.FC = () => {
                 className="text-purple-400 underline focus:outline-none"
                 onClick={() => {
                   setLogin("login");
-                  setEmail("");
-                  setPassword("");
-                  setConfirmPassword("");
                 }}
               >
                 Login

@@ -12,7 +12,6 @@ function Index() {
       <Routes>
         {/* Redirect "/" instantly to "/login" */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-
         {/* Public Route */}
         <Route path="/login" element={<Login />} />
 

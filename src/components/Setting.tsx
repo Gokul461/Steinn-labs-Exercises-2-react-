@@ -11,7 +11,7 @@ const Setting: React.FC = () => {
   const [phone, setPhone] = useState<string>('');
   const [gender, setGender] = useState<string>('');
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevents page reload
 
     if (!name || !email || !age || !phone || !address || !gender) {
@@ -31,8 +31,6 @@ const Setting: React.FC = () => {
       });
 
       alert("Data submitted successfully!");
-
-      // Clear form fields
       setName('');
       setAge('');
       setEmail('');
@@ -50,7 +48,7 @@ const Setting: React.FC = () => {
     <div className="flex items-center h-[500px] overflow-y justify-center bg-gray-100">
       <form onSubmit={handleSubmit} className="bg-white text-black p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-4 text-gray-700">User Registration</h2>
-
+        <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
         <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-blue-500"
         />
@@ -69,7 +67,6 @@ const Setting: React.FC = () => {
         <input type="text" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-blue-500"
         />
-        
         <label className="block text-gray-600 font-medium">Active Status</label>
         <select value={isActive.toString()} onChange={(e) => setIsActive(e.target.value === "true")}
           className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-blue-500"
@@ -83,6 +80,12 @@ const Setting: React.FC = () => {
         >
           Submit
         </button>
+        <button
+                  type="submit"
+                  className="bg-teal-700 text-white mt-2 absolute bottom-4 right-8 p-2 rounded-lg hover:bg-teal-500 transition w-[100px]"
+                >
+                  Submit
+                </button>
       </form>
     </div>
     

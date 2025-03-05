@@ -23,7 +23,7 @@ import { db } from "../pages/firebase";
 import { capitalize } from "lodash";
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc} from "firebase/firestore";
 // import AddStudentModal from "./Additem";
-import Modalcompo from "./Modal";
+import Modalcompo from "./Modalcompo";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -158,7 +158,7 @@ export const PlusIcon = ({ size = 24, width, height, ...props }: IconSvgProps) =
   );
 };
 
-export default function StudentTable() {
+export default function Dashboard() {
   const [students, setStudents] = useState<Student[]>([]);
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
