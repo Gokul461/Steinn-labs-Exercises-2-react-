@@ -1,18 +1,30 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Maincontainer from './Maincontainer';
-import Login from './Login';
-import Dashboard from '../components/Dashboard';
-import Category from './Category';
-import { AuthProvider } from '../services/AuthContext';
-import ProtectedRoute from '../services/ProtectedRouting';
-import Home from '../pages/Home';
-import Navbar from '../components/Navbar';
-import ProductList from '../components/ProductList';
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import Maincontainer from "./Maincontainer";
+import Login from "./Login";
+import Dashboard from "../components/Dashboard";
+import Category from "./Category";
+import { AuthProvider } from "../services/AuthContext";
+import ProtectedRoute from "../services/ProtectedRouting";
+import Home from "../pages/Home";
+import Navbar from "../components/Navbar";
+import ProductList from "../components/ProductList";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]); 
+
+  return null;
+}
 
 function Index() {
   return (
     <AuthProvider>
       <Navbar />
+      <ScrollToTop />
       <Routes>
         {/* Public Route */}
         <Route path="/" element={<Navigate to="/login" replace />} />
