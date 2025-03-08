@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input, Form } from "@heroui/react";
-import { auth } from "./firebase";
+import { auth } from "./Firebase";
 import Loadingbtn from "../components/LoadingButton";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from "../services/AuthContext";
@@ -42,7 +42,7 @@ const Login: React.FC = () => {
         navigate("/login");
       }
       else{
-        navigate("/dashboard");
+        navigate("/home");
       }
     }
   }, [user, navigate]);
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         setUser(userCredential.user);
         setUserEmail(email);
-        navigate("/dashboard");
+        navigate("/home");
       }
     } catch (error: any) {
       let message = "Something went wrong. Please try again.";

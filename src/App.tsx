@@ -1,9 +1,11 @@
 import Index from './pages/Index'
+import { QueryClientProvider, QueryClient } from'react-query';
 function App() {
+  const queryClient = new QueryClient();
   return (
-    <div>
+    <QueryClientProvider client={queryClient}>
       <Index/>
-    </div>
+    </QueryClientProvider>
   );
 }
 

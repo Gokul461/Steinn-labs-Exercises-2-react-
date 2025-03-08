@@ -19,7 +19,7 @@ import {
   Selection,
   SortDescriptor,
 } from "@heroui/react";
-import { db } from "../pages/firebase";
+import { db } from "../pages/Firebase";
 import { capitalize } from "lodash";
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc} from "firebase/firestore";
 // import AddStudentModal from "./Additem";

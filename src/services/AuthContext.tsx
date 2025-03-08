@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
-import { auth } from "../pages/firebase"; 
+import { auth } from "../pages/Firebase"; 
 import { Spinner } from '@heroui/react';
 
 interface AuthContextType {

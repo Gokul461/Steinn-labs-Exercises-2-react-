@@ -1,0 +1,12 @@
+
+.swiper-button-prev, 
+.swiper-button-next {
+  width: 30px ; 
+  height: 30px ;
+}
+
+.swiper-button-prev::after, 
+.swiper-button-next::after {
+  color: white ; 
+  font-size: 20px ;
+}
