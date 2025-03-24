@@ -1,50 +1,42 @@
-# Vite & HeroUI Template
+# 🚀 Steinn Labs Intern Exercise 2
 
-This is a template for creating applications using Vite and HeroUI (v2).
+This project is a web application built with React, TypeScript, and `react-query`. It includes a Student Dashboard UI and an E-commerce UI with various components and functionalities to display and filter products, as well as manage pagination.
 
-[Try it on CodeSandbox](https://githubbox.com/frontio-ai/vite-template)
+## 📌 Table of Contents
 
-## Technologies Used
+- [Installation](#installation)
+- [Usage](#usage)
+- [Components](#components)
+  - [Home](#home)
+  - [ProductList](#productlist)
+  - [ProductCard](#productcard)
+  - [ProductFilter](#productfilter)
+  - [CircularSpinner](#circularspinner)
+  - [Pagination](#pagination)
+  - [Dashboard](#dashboard)
+  - [Category](#category)
+  - [Login](#login)
+  - [Navbar](#navbar)
+  - [ProtectedRoute](#protectedroute)
+- [API](#api)
+- [License](#license)
 
-- [Vite](https://vitejs.dev/guide/)
-- [HeroUI](https://heroui.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
 
-## How to Use
+## 📦 Libraries Used
 
-To clone the project, run the following command:
+- **React** - A JavaScript library for building user interfaces.
+- **TypeScript** - A strongly typed programming language that builds on JavaScript.
+- **React Query** - Data fetching and state management for React applications.
+- **HeroUI** - A UI component library for enhanced styling and user experience.
 
-```bash
-git clone https://github.com/frontio-ai/vite-template.git
-```
 
-### Install dependencies
+![image](https://github.com/user-attachments/assets/11c32927-efe6-4e12-b4a8-2faeb5d091b5)
+![image](https://github.com/user-attachments/assets/47e30add-8c2e-4b56-9586-b0b9ec6b3a8d)
+![image](https://github.com/user-attachments/assets/1f427d12-bde1-4c37-be8a-8621c29c3e2e)
+![image](https://github.com/user-attachments/assets/480347d4-167e-4558-9f29-de4cf0e4c12f)
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
-
-```bash
-npm install
-```
-
-### Run the development server
-
-```bash
-npm run dev
-```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@heroui/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
-
-## License
+## 📝 License
 
 Licensed under the [MIT license](https://github.com/frontio-ai/vite-template/blob/main/LICENSE).
+
+Happy coding ❤️
