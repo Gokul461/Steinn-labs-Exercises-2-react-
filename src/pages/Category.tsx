@@ -15,7 +15,7 @@ const Category: React.FC = () => {
     const data = await response.json();
     return Array.isArray(data.data) ? data.data : [];
   }
-  const { data: categories = [], isLoading, error } = useQuery(["categories"],fetchCategory,);
+  const { data: categories = [], isLoading, error } = useQuery(["categories"],fetchCategory);
   return (
     <div className="bg-gradient-to-r from-purple-100 via-purple-50 to-purple-200 min-h-screen">
       <div className="max-w-7xl mx-auto py-16 px-6">
